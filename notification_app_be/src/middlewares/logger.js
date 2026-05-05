@@ -1,3 +1,5 @@
+const Log = require("../utils/logger");
+
 const logger = (req, res, next) => {
   const startTime = Date.now();
 
@@ -6,6 +8,7 @@ const logger = (req, res, next) => {
     console.log(
       `[${new Date().toISOString()}] ${req.method} ${req.originalUrl} ${res.statusCode} - ${duration}ms`
     );
+    Log("backend", "info", "middleware", `${req.method} ${req.originalUrl} completed with status ${res.statusCode}`);
   });
 
   next();

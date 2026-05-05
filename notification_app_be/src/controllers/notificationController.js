@@ -1,10 +1,13 @@
 const notificationService = require("../services/notificationService");
+const Log = require("../utils/logger");
 
 const createNotification = async (req, res) => {
   try {
+    Log("backend", "info", "controller", "create notification request received");
     const { studentId, type, message } = req.body;
 
     if (!studentId || !type || !message) {
+      Log("backend", "warn", "controller", "missing required notification fields");
       return res.status(400).json({
         success: false,
         message: "studentId, type and message are required"
@@ -20,12 +23,14 @@ const createNotification = async (req, res) => {
     const io = req.app.get("io");
     io.to(`student_${studentId}`).emit("notification:new", notification);
 
+    Log("backend", "info", "controller", "notification created successfully");
     return res.status(201).json({
       success: true,
       message: "Notification created successfully",
       notification
     });
   } catch (error) {
+    Log("backend", "error", "controller", error.message);
     return res.status(500).json({ success: false, message: error.message });
   }
 };

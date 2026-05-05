@@ -7,6 +7,7 @@ const { Server } = require("socket.io");
 
 const connectDB = require("./config/db");
 const logger = require("./middlewares/logger");
+const Log = require("./utils/logger");
 const notificationRoutes = require("./routes/notificationRoutes");
 
 const app = express();
@@ -47,8 +48,13 @@ io.on("connection", (socket) => {
 
 const PORT = process.env.PORT || 5000;
 
+Log("backend", "info", "config", "server startup initiated");
+
 connectDB().then(() => {
+  Log("backend", "info", "db", "database connected successfully");
   server.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
   });
+}).catch((error) => {
+  Log("backend", "fatal", "db", `database connection failed: ${error.message}`);
 });

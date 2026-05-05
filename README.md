@@ -2,32 +2,110 @@
 
 ## 🚀 Overview
 
-This project is a full-stack **Notification System** designed to handle real-time and persistent notifications for students.
+Full-stack **Notification System** for students with real-time updates and centralized logging.
 
-It supports:
-
-* Placement updates
-* Result announcements
-* Event notifications
-
-The system is built with a focus on **scalability, real-time communication, and clean architecture**.
+**Features:**
+- Real-time notifications (Placement, Result, Event)
+- Centralized logging to AffordMed evaluation service
+- MongoDB with optimized indexes
+- Socket.io for instant updates
 
 ---
 
 ## 🛠️ Tech Stack
 
-### Backend
+**Backend:** Node.js, Express, MongoDB, Socket.io, Axios  
+**Frontend:** React, Vite, Socket.io Client
 
-* Node.js
-* Express.js
-* MongoDB (Mongoose)
-* Socket.io
+---
 
-### Frontend
+## 📝 Logging Middleware Setup
 
-* React.js
-* Vite
-* Socket.io Client
+This project uses a centralized logging system that sends structured logs to the AffordMed evaluation service.
+
+### Step 1: Get Your Access Token
+
+Obtain your access token from the AffordMed evaluation service. This token is required to authenticate log requests.
+
+### Step 2: Configure Backend Environment
+
+1. Navigate to `notification_app_be/`
+2. Copy `.env.example` to `.env`:
+   ```bash
+   cp .env.example .env
+   ```
+3. Open `.env` and replace the placeholder:
+   ```
+   ACCESS_TOKEN=replace_with_your_access_token
+   ```
+   Paste your actual access token after `ACCESS_TOKEN=`
+
+### Step 3: Configure Frontend Environment
+
+1. Navigate to `notification_app_fe/`
+2. Copy `.env.example` to `.env`:
+   ```bash
+   cp .env.example .env
+   ```
+3. Open `.env` and replace the placeholder:
+   ```
+   VITE_ACCESS_TOKEN=replace_with_your_access_token
+   ```
+   Paste your actual access token after `VITE_ACCESS_TOKEN=`
+
+### Step 4: Install Dependencies
+
+**Backend:**
+```bash
+cd notification_app_be
+npm install
+```
+
+**Frontend:**
+```bash
+cd notification_app_fe
+npm install
+```
+
+### Step 5: Start the Application
+
+**Backend (Terminal 1):**
+```bash
+cd notification_app_be
+npm run dev
+```
+Server runs on http://localhost:5000
+
+**Frontend (Terminal 2):**
+```bash
+cd notification_app_fe
+npm run dev
+```
+UI runs on http://localhost:5173
+
+### How Logging Works
+
+The `Log(stack, level, package, message)` function is automatically called throughout the application:
+
+- **Backend** uses `notification_app_be/src/utils/logger.js` with Axios
+- **Frontend** uses `notification_app_fe/src/utils/logger.js` with Fetch
+
+**Log Parameters:**
+- `stack`: "backend" or "frontend"
+- `level`: "debug", "info", "warn", "error", "fatal"
+- `package`: Component type (controller, service, api, component, etc.)
+- `message`: Log message
+
+**Where Logs Are Sent:**
+- API: `http://20.207.122.201/evaluation-service/logs`
+- Method: POST
+- Auth: Bearer token from your `.env` file
+
+**Important Notes:**
+- Never commit `.env` files to git
+- Only `.env.example` should be in version control
+- Invalid log values show console warnings but don't crash the app
+- API failures are caught and logged locally
 
 ---
 
@@ -35,59 +113,32 @@ The system is built with a focus on **scalability, real-time communication, and 
 
 ```
 notification_system/
-│
-├── notification_app_be/                # Backend (Node.js + Express)
+├── notification_app_be/          # Backend
 │   ├── src/
-│   │   ├── config/                    # Database connection
-│   │   ├── controllers/               # Business logic
-│   │   ├── middlewares/               # Logger, Auth middleware
-│   │   ├── models/                    # Mongoose schemas
-│   │   ├── routes/                    # API routes
-│   │   ├── services/                  # Core logic layer
-│   │   ├── utils/                     # Helper functions
-│   │   └── server.js                  # Entry point
-│   │
-│   ├── .env.example                   # Environment variables template
-│   ├── package.json
-│   └── README.md
+│   │   ├── config/              # Database connection
+│   │   ├── controllers/         # Business logic
+│   │   ├── middlewares/         # Logger, Auth
+│   │   ├── models/              # Mongoose schemas
+│   │   ├── routes/              # API routes
+│   │   ├── services/            # Core logic
+│   │   ├── utils/               # Logger utility
+│   │   └── server.js            # Entry point
+│   ├── .env.example             # Environment template
+│   └── package.json
 │
-├── notification_app_fe/                # Frontend (React + Vite)
+├── notification_app_fe/          # Frontend
 │   ├── src/
-│   │   ├── components/                # UI components
-│   │   ├── App.jsx                    # Main app logic
-│   │   ├── main.jsx                   # Entry point
-│   │   └── style.css                  # Styling
-│   │
-│   ├── index.html
-│   ├── package.json
-│   └── README.md
+│   │   ├── components/          # UI components
+│   │   ├── utils/               # Logger utility
+│   │   ├── App.jsx              # Main app
+│   │   └── main.jsx             # Entry point
+│   ├── .env.example             # Environment template
+│   └── package.json
 │
-├── notification_systemdesign.md        # System Design (Stage 1–6)
-├── QA_AUDIT_REPORT.md                 # Testing & analysis report
-├── README.md                          # Project overview
-└── .gitignore
+├── notification_systemdesign.md  # System design
+├── QA_AUDIT_REPORT.md           # QA audit findings
+└── README.md
 ```
-
----
-
-## ⚙️ Features
-
-### Backend
-
-* Create notification
-* Fetch notifications
-* Mark as read
-* Delete notification
-* Unread count
-* Logging middleware
-* Real-time notifications (Socket.io)
-
-### Frontend
-
-* Notification dashboard
-* Real-time updates
-* Unread badge count
-* Mark as read UI
 
 ---
 
@@ -105,56 +156,30 @@ notification_system/
 
 ## 🔄 Real-Time Flow
 
-* User connects via Socket.io
-* Server assigns user to a room
-* New notification triggers:
-  → `io.emit("notification:new")`
-* UI updates instantly without refresh
+1. User connects via Socket.io
+2. Server assigns user to room `student_{studentId}`
+3. New notification triggers `io.emit("notification:new")`
+4. UI updates instantly without refresh
 
 ---
 
-## 🧠 Design Highlights
+## 🔍 QA Audit Report
 
-* Layered architecture (Routes → Controller → Service → Model)
-* Logging middleware for request tracking
-* Indexed queries for performance
-* Pagination for scalability
-* Queue-based design for bulk notifications
+**Production Readiness Score: 7.5/10**
 
----
+Comprehensive audit covering:
+- Installation & dependencies ✅
+- Environment configuration ✅
+- API functionality ✅
+- Database validation ✅
+- Logging middleware ✅
+- Real-time Socket.io ✅
+- Frontend functionality ✅
+- Performance optimization ✅
+- Security checks ⚠️
+- Code quality ✅
 
-## ▶️ How to Run
-
-### Backend
-
-```bash
-cd notification_app_be
-npm install
-npm run dev
-```
-
-### Frontend
-
-```bash
-cd notification_app_fe
-npm install
-npm run dev
-```
-
----
-
-## 📊 System Design
-
-Refer to:
-📄 `notification_systemdesign.md`
-
-Includes:
-
-* API Design
-* Database Design
-* Query Optimization
-* Scaling Strategy
-* Bulk Notification System
+**Detailed findings:** See `QA_AUDIT_REPORT.md`
 
 ---
 

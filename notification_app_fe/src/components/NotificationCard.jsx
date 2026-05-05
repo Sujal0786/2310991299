@@ -1,3 +1,5 @@
+import React from "react";
+
 const NotificationCard = ({ notification, onMarkRead }) => {
   return (
     <div className={`card ${notification.isRead ? "read" : "unread"}`}>

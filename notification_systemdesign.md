@@ -60,3 +60,42 @@ Placement > Result > Event
 Logic:
 Sort by priority + timestamp
 Return top N unread notifications.
+
+## Logging Middleware Design
+
+### Why Centralized Logging?
+
+Centralized logging provides a unified way to track application behavior across both backend and frontend. It enables:
+
+- Structured log data sent to a remote evaluation service
+- Consistent log format across the entire application
+- Easy debugging and monitoring
+- Security through token-based authentication
+
+### Where Logs Are Added
+
+**Backend:**
+- `server.js`: Server startup, database connection status
+- `middlewares/logger.js`: HTTP request completion tracking
+- `controllers/`: Request received, validation errors, success/failure
+- `services/`: Database operations, business logic execution
+
+**Frontend:**
+- `App.jsx`: Page load, API calls, socket connection, user interactions
+
+### Error Handling
+
+The logging utility includes robust error handling:
+
+- **Validation**: Invalid stack, level, or package values trigger console warnings and skip API calls
+- **API Failures**: Network errors are caught and logged locally without breaking application flow
+- **Normalization**: All values are converted to lowercase before validation to ensure consistency
+
+### Security Note
+
+The access token for the logging API is stored in environment variables:
+
+- Backend: `ACCESS_TOKEN` in `.env`
+- Frontend: `VITE_ACCESS_TOKEN` in `.env`
+
+This prevents token exposure in source code. The `.env` files are never committed to version control. Only `.env.example` templates are included in the repository.

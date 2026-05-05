@@ -1,10 +1,12 @@
 const Notification = require("../models/Notification");
+const Log = require("../utils/logger");
 
 const createNotification = async ({ studentId, type, message }) => {
   return Notification.create({ studentId, type, message });
 };
 
 const getNotifications = async ({ studentId, page = 1, limit = 20, type, isRead }) => {
+  Log("backend", "debug", "service", "fetching notifications from database");
   const filter = { studentId };
 
   if (type) filter.type = type;
@@ -21,6 +23,7 @@ const getNotifications = async ({ studentId, page = 1, limit = 20, type, isRead 
 };
 
 const markAsRead = async ({ studentId, notificationId }) => {
+  Log("backend", "debug", "service", "marking notification as read");
   return Notification.findOneAndUpdate(
     { _id: notificationId, studentId },
     { isRead: true, readAt: new Date() },
@@ -40,6 +43,7 @@ const deleteNotification = async ({ studentId, notificationId }) => {
 };
 
 const unreadCount = async ({ studentId }) => {
+  Log("backend", "debug", "service", "counting unread notifications");
   return Notification.countDocuments({ studentId, isRead: false });
 };
 

@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 import NotificationCard from "./components/NotificationCard";
+import Log from "./utils/logger";
 
 const API_URL = "http://localhost:5000/api/notifications";
 const STUDENT_ID = 1042;
@@ -11,13 +12,18 @@ function App() {
   const [message, setMessage] = useState("");
 
   const fetchNotifications = async () => {
-    const response = await fetch(API_URL, {
-      headers: {
-        "x-student-id": STUDENT_ID
-      }
-    });
-    const data = await response.json();
-    setNotifications(data.notifications || []);
+    Log("frontend", "debug", "api", "fetching notifications");
+    try {
+      const response = await fetch(API_URL, {
+        headers: {
+          "x-student-id": STUDENT_ID
+        }
+      });
+      const data = await response.json();
+      setNotifications(data.notifications || []);
+    } catch (error) {
+      Log("frontend", "error", "api", error.message);
+    }
   };
 
   const createNotification = async (event) => {
@@ -41,6 +47,7 @@ function App() {
   };
 
   const markRead = async (id) => {
+    Log("frontend", "info", "component", "mark as read clicked");
     await fetch(`${API_URL}/${id}/read`, {
       method: "PATCH",
       headers: {
@@ -52,10 +59,15 @@ function App() {
   };
 
   useEffect(() => {
+    Log("frontend", "info", "page", "notification dashboard loaded");
     fetchNotifications();
 
     const socket = io("http://localhost:5000", {
       query: { studentId: STUDENT_ID }
+    });
+
+    socket.on("connect", () => {
+      Log("frontend", "info", "hook", "socket connected for notifications");
     });
 
     socket.on("notification:new", (notification) => {
