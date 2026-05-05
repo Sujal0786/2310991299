@@ -19,69 +19,179 @@ Full-stack **Notification System** for students with real-time updates and centr
 
 ---
 
+## � How to Get Access Token (Required for Logging API)
+
+To use logging middleware, you must generate an **access token** from AffordMed test server.
+
+### Step 1: Register Yourself
+
+Make a **POST request** to:
+
+```http
+POST http://20.207.122.201/evaluation-service/register
+```
+
+#### Request Body:
+
+```json
+{
+  "email": "your_college_email",
+  "name": "Your Full Name",
+  "mobileNo": "your_mobile_number",
+  "githubUsername": "your_github_username",
+  "rollNo": "your_roll_number",
+  "accessCode": "access_code_from_email"
+}
+```
+
+**Important:**
+- Use your **college email**
+- GitHub username should be **only username (not full URL)**
+
+---
+
+### Step 2: Generate Access Token
+
+Make another **POST request** to:
+
+```http
+POST http://20.207.122.201/evaluation-service/auth
+```
+
+#### Request Body:
+
+```json
+{
+  "email": "your_college_email",
+  "name": "Your Full Name",
+  "rollNo": "your_roll_number",
+  "accessCode": "your_access_code",
+  "clientID": "received_from_registration",
+  "clientSecret": "received_from_registration"
+}
+```
+
+---
+
+### Step 3: Copy Access Token
+
+Response will contain:
+
+```json
+{
+  "token_type": "Bearer",
+  "access_token": "your_access_token_here",
+  "expires_in": 1777960758
+}
+```
+
+---
+
+### Step 4: Add Token to Environment Variables
+
+#### Backend `.env`
+
+```env
+ACCESS_TOKEN=your_access_token_here
+```
+
+#### Frontend `.env`
+
+```env
+VITE_ACCESS_TOKEN=your_access_token_here
+```
+
+---
+
+### ⚠️ Important Notes
+
+- Do **NOT** push `.env` file to GitHub
+- Keep token **secure**
+- Token is required for **Logging API**
+- If token expires, regenerate using Step 2
+
+---
+
+### 🧪 Test Logging API
+
+```http
+POST http://20.207.122.201/evaluation-service/logs
+```
+
+**Headers:**
+
+```http
+Authorization: Bearer your_access_token
+Content-Type: application/json
+```
+
+**Body:**
+
+```json
+{
+  "stack": "backend",
+  "level": "info",
+  "package": "controller",
+  "message": "test log working"
+}
+```
+
+---
+
+### ✅ Expected Response
+
+```json
+{
+  "logID": "xxxx",
+  "message": "log created successfully"
+}
+```
+
+---
+
 ## 📝 Logging Middleware Setup
 
-This project uses a centralized logging system that sends structured logs to the AffordMed evaluation service.
+After getting your access token, configure the application:
 
-### Step 1: Get Your Access Token
-
-Obtain your access token from the AffordMed evaluation service. This token is required to authenticate log requests.
-
-### Step 2: Configure Backend Environment
+### Step 1: Configure Backend Environment
 
 1. Navigate to `notification_app_be/`
 2. Copy `.env.example` to `.env`:
    ```bash
    cp .env.example .env
    ```
-3. Open `.env` and replace the placeholder:
+3. Open `.env` and add your access token:
    ```
-   ACCESS_TOKEN=replace_with_your_access_token
+   ACCESS_TOKEN=your_actual_access_token_here
    ```
-   Paste your actual access token after `ACCESS_TOKEN=`
 
-### Step 3: Configure Frontend Environment
+### Step 2: Configure Frontend Environment
 
 1. Navigate to `notification_app_fe/`
 2. Copy `.env.example` to `.env`:
    ```bash
    cp .env.example .env
    ```
-3. Open `.env` and replace the placeholder:
+3. Open `.env` and add your access token:
    ```
-   VITE_ACCESS_TOKEN=replace_with_your_access_token
+   VITE_ACCESS_TOKEN=your_actual_access_token_here
    ```
-   Paste your actual access token after `VITE_ACCESS_TOKEN=`
 
-### Step 4: Install Dependencies
+### Step 3: Install Dependencies & Run
 
 **Backend:**
 ```bash
 cd notification_app_be
 npm install
+npm run dev
 ```
 
 **Frontend:**
 ```bash
 cd notification_app_fe
 npm install
-```
-
-### Step 5: Start the Application
-
-**Backend (Terminal 1):**
-```bash
-cd notification_app_be
 npm run dev
 ```
-Server runs on http://localhost:5000
-
-**Frontend (Terminal 2):**
-```bash
-cd notification_app_fe
-npm run dev
-```
-UI runs on http://localhost:5173
 
 ### How Logging Works
 
@@ -104,7 +214,7 @@ The `Log(stack, level, package, message)` function is automatically called throu
 **Important Notes:**
 - Never commit `.env` files to git
 - Only `.env.example` should be in version control
-- Invalid log values show console warnings but don't crash the app
+- Invalid log values show console warnings but don't crash app
 - API failures are caught and logged locally
 
 ---
