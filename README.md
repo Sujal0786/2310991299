@@ -1,4 +1,4 @@
-# 📢 Notification System (Full Stack)
+# Notification System (Full Stack)
 
 ## 🚀 Overview
 
@@ -33,11 +33,40 @@ The system is built with a focus on **scalability, real-time communication, and 
 
 ## 📂 Project Structure
 
+```
 notification_system/
-├── notification_app_be/ # Backend
-├── notification_app_fe/ # Frontend
-├── notification_systemdesign.md # System Design
-├── .gitignore
+│
+├── notification_app_be/                # Backend (Node.js + Express)
+│   ├── src/
+│   │   ├── config/                    # Database connection
+│   │   ├── controllers/               # Business logic
+│   │   ├── middlewares/               # Logger, Auth middleware
+│   │   ├── models/                    # Mongoose schemas
+│   │   ├── routes/                    # API routes
+│   │   ├── services/                  # Core logic layer
+│   │   ├── utils/                     # Helper functions
+│   │   └── server.js                  # Entry point
+│   │
+│   ├── .env.example                   # Environment variables template
+│   ├── package.json
+│   └── README.md
+│
+├── notification_app_fe/                # Frontend (React + Vite)
+│   ├── src/
+│   │   ├── components/                # UI components
+│   │   ├── App.jsx                    # Main app logic
+│   │   ├── main.jsx                   # Entry point
+│   │   └── style.css                  # Styling
+│   │
+│   ├── index.html
+│   ├── package.json
+│   └── README.md
+│
+├── notification_systemdesign.md        # System Design (Stage 1–6)
+├── QA_AUDIT_REPORT.md                 # Testing & analysis report
+├── README.md                          # Project overview
+└── .gitignore
+```
 
 ---
 
